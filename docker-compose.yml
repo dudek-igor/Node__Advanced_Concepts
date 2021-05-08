@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  app:
+    image: node:14
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+    ports:
+      - 80:8080
+    command: 'npm run dev'
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongodb:/data/db
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dudekigor
+      MONGO_INITDB_ROOT_PASSWORD: dudekigorsecret
+      MONGO_INITDB_DATABASE: blogster
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: dudekigor
+      ME_CONFIG_MONGODB_ADMINPASSWORD: dudekigorsecret
+      ME_CONFIG_MONGODB_AUTH_DATABASE: blogster
+volumes:
+  mongodb:
