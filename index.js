@@ -2,25 +2,45 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
+const redis = require('redis');
 const keys = require('./config/keys');
 
 require('./models/User');
 require('./models/Blog');
 require('./services/passport');
-
+// DB
 mongoose.Promise = global.Promise;
 const conn = mongoose.connect(keys.mongoURI, { useMongoClient: true });
 
 conn.on('error', (err) => {
-  console.log('Error');
-  console.log(err);
+  console.log('MONGOOSE: error');
+  console.error(err);
 });
 conn.on('connected', () => {
   console.log('MONGOOSE: connected');
 });
-
+// Redis
+const redisUrl = 'redis://redis:6379';
+const redisClient = redis.createClient(redisUrl);
+redisClient.on('error', (err) => {
+  console.log('REDIS: error');
+  console.log(err);
+});
+redisClient.once('connect', (error) => {
+  console.log('REDIS: connected');
+});
+// redisClient.get('gretteing', (err, txt) => {
+//   if (err) console.log(err);
+//   else console.log(txt);
+// });
+redisClient.hset('gretteings', 'pl', 'Witaj Świecie');
+redisClient.hgetall('gretteings', (err, val) => {
+  console.log(val);
+});
+// App
 const app = express();
-
+// Set Redis Client
+app.set('redisClient', redisClient);
 app.use(express.json());
 app.use(
   cookieSession({

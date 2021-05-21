@@ -31,5 +31,9 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: dudekigor
       ME_CONFIG_MONGODB_ADMINPASSWORD: dudekigorsecret
       ME_CONFIG_MONGODB_AUTH_DATABASE: blogster
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
 volumes:
   mongodb:
