@@ -8,10 +8,14 @@ const keys = require('./config/keys');
 require('./models/User');
 require('./models/Blog');
 require('./services/passport');
+require('./services/cache');
 // DB
 mongoose.Promise = global.Promise;
-const conn = mongoose.connect(keys.mongoURI, { useMongoClient: true });
-
+mongoose.connect(keys.mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+const conn = mongoose.connection;
 conn.on('error', (err) => {
   console.log('MONGOOSE: error');
   console.error(err);
@@ -19,28 +23,20 @@ conn.on('error', (err) => {
 conn.on('connected', () => {
   console.log('MONGOOSE: connected');
 });
-// Redis
-const redisUrl = 'redis://redis:6379';
-const redisClient = redis.createClient(redisUrl);
-redisClient.on('error', (err) => {
-  console.log('REDIS: error');
-  console.log(err);
-});
-redisClient.once('connect', (error) => {
-  console.log('REDIS: connected');
-});
+
 // redisClient.get('gretteing', (err, txt) => {
 //   if (err) console.log(err);
 //   else console.log(txt);
 // });
-redisClient.hset('gretteings', 'pl', 'Witaj Świecie');
-redisClient.hgetall('gretteings', (err, val) => {
-  console.log(val);
-});
+// redisClient.flushall();
+// redisClient.hset('gretteings', 'pl', 'Witaj Świecie');
+// redisClient.hgetall('gretteings', (err, val) => {
+//   console.log(val);
+// });
 // App
 const app = express();
 // Set Redis Client
-app.set('redisClient', redisClient);
+// app.set('redisClient', redisClient);
 app.use(express.json());
 app.use(
   cookieSession({
